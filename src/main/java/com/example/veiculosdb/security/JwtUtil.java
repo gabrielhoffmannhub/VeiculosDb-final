@@ -14,13 +14,7 @@ public class JwtUtil {
     private final Key secretKey;
     private final long expirationMillis = 1000 * 60 * 60;
 
-
     public JwtUtil(@Value("${jwt.secret.key}") String secret) {
-        if (secret == null || secret.isEmpty()) {
-            throw new IllegalStateException("A variável de ambiente JWT_SECRET_KEY não está configurada.");
-        }
-
-
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
@@ -49,12 +43,6 @@ public class JwtUtil {
                     .build()
                     .parseClaimsJws(token);
             return true;
-        } catch (ExpiredJwtException e) {
-            return false;
-        } catch (UnsupportedJwtException e) {
-            return false;
-        } catch (MalformedJwtException e) {
-            return false;
         } catch (JwtException e) {
             return false;
         }

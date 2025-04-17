@@ -13,9 +13,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+@ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 public class CarroControllerCreateTest {
 
     @Autowired
@@ -55,7 +55,7 @@ public class CarroControllerCreateTest {
         MvcResult result = mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginJson))
-                .andExpect(status().isOk())
+                .andExpect(status().isOk()) // Espera um status 200 (OK)
                 .andReturn();
 
         return result.getResponse().getContentAsString();
