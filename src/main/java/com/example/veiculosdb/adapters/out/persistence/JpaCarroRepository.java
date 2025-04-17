@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
+import java.util.List;
 
 public interface JpaCarroRepository extends JpaRepository<Carro, Long> {
 
@@ -15,4 +16,6 @@ public interface JpaCarroRepository extends JpaRepository<Carro, Long> {
 
     @Query("SELECT c FROM Carro c WHERE (:marca IS NULL OR c.marca = :marca) AND (:tipo IS NULL OR c.tipo = :tipo)")
     Page<Carro> buscarPorMarcaTipo(@Param("marca") String marca, @Param("tipo") String tipo, Pageable pageable);
+
+    List<Carro> findByMarca(String marca);
 }

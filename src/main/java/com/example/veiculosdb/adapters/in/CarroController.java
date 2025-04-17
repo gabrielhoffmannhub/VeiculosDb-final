@@ -30,10 +30,9 @@ public class CarroController {
         carro.setValorMercado(dto.getValorMercado());
 
         Carro carroSalvo = carroService.salvar(carro);
-
         CarroResponseDTO responseDTO = new CarroResponseDTO(carroSalvo);
 
-        URI location = URI.create("/carros/" + carroSalvo.getId());
+        URI location = URI.create("/api/v1/carros/" + carroSalvo.getId());
         return ResponseEntity.created(location).body(responseDTO);
     }
 
@@ -42,8 +41,8 @@ public class CarroController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String marca,
-            @RequestParam(required = false) String tipo
-    ) {
+            @RequestParam(required = false) String tipo) {
+
         Page<Carro> resultado = carroService.buscarComFiltro(marca, tipo, page, size);
         Page<CarroResponseDTO> response = resultado.map(CarroResponseDTO::new);
         return ResponseEntity.ok(response);
@@ -52,19 +51,11 @@ public class CarroController {
     @GetMapping("/{placa}")
     public ResponseEntity<CarroResponseDTO> buscarPorPlaca(@PathVariable String placa) {
         return carroService.buscarPorPlaca(placa)
-                .map(carro -> {
-                    CarroResponseDTO response = new CarroResponseDTO();
-                    response.setId(carro.getId());
-                    response.setMarca(carro.getMarca());
-                    response.setModelo(carro.getModelo());
-                    response.setAnoFabricacao(carro.getAnoFabricacao());
-                    response.setPlaca(carro.getPlaca());
-                    response.setTipo(carro.getTipo());
-                    response.setValorMercado(carro.getValorMercado());
-                    return ResponseEntity.ok(response);
-                })
+                .map(carro -> new CarroResponseDTO(carro))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
     @GetMapping("/{placa}/depreciacao")
     public ResponseEntity<BigDecimal> calcularDepreciacao(@PathVariable String placa) {
         return carroService.buscarPorPlaca(placa)
@@ -75,11 +66,10 @@ public class CarroController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-
     @PutMapping("/{placa}")
     public ResponseEntity<Carro> atualizarCarro(@PathVariable String placa, @RequestBody CarroRequestDTO dto) {
         return carroService.atualizarPorPlaca(placa, dto)
-                .map(carroAtualizado -> ResponseEntity.ok().body(carroAtualizado))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 

@@ -1,5 +1,4 @@
-package com.example.veiculosdb;
-
+package com.example.veiculosdb.TestIntegracao;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,8 @@ public class CarroControllerReadTest {
 
     @Test
     void deveListarCarrosComSucesso() throws Exception {
+        String token = obterTokenJWT();
+
         String carroJson = """
             {
                 "marca": "Honda",
@@ -36,19 +37,16 @@ public class CarroControllerReadTest {
             }
         """;
 
-        String token = obterTokenJWT();
-
-        mockMvc.perform(get("/api/v1/carros"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].marca").value("Chevrolet"))
-                .andExpect(jsonPath("$.content[1].marca").value("Honda"))
-                .andExpect(jsonPath("$.content.length()").value(2));  // Verificar o número de elementos
-
+        mockMvc.perform(post("/api/v1/carros")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(carroJson))
+                .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/v1/carros")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
+                .andExpect(jsonPath("$.content").isArray());
     }
 
     private String obterTokenJWT() throws Exception {

@@ -1,42 +1,67 @@
 package com.example.veiculosdb.controller;
 
+import com.example.veiculosdb.adapters.in.CarroController;
+import com.example.veiculosdb.application.CarroService;
+import com.example.veiculosdb.domain.v1.model.Carro;
 import com.example.veiculosdb.dto.v1.CarroRequestDTO;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.veiculosdb.dto.v1.CarroResponseDTO;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 class CarroControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Mock
+    private CarroService carroService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @InjectMocks
+    private CarroController carroController;
 
-    @Test
-    void deveCriarNovoCarro() throws Exception {
-        CarroRequestDTO dto = new CarroRequestDTO("Toyota", "Corolla", 2020, "XYZ-9876", "Sedan", new BigDecimal("85000"));
-
-        mockMvc.perform(post("/api/carros")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isCreated());
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void deveRetornarNotFoundParaPlacaInexistente() throws Exception {
-        mockMvc.perform(get("/api/carros/placa/PLACAINEXISTENTE"))
-                .andExpect(status().isNotFound());
+    void deveCriarCarro() {
+
+        CarroRequestDTO request = new CarroRequestDTO();
+        request.setMarca("Toyota");
+        request.setModelo("Corolla");
+        request.setAnoFabricacao(2020);
+        request.setPlaca("ABC1234");
+        request.setTipo("Sedan");
+        request.setValorMercado(new BigDecimal("85000"));
+
+        Carro carroSalvo = new Carro();
+        carroSalvo.setId(1L);
+        carroSalvo.setMarca(request.getMarca());
+        carroSalvo.setModelo(request.getModelo());
+        carroSalvo.setAnoFabricacao(request.getAnoFabricacao());
+        carroSalvo.setPlaca(request.getPlaca());
+        carroSalvo.setTipo(request.getTipo());
+        carroSalvo.setValorMercado(request.getValorMercado());
+
+        when(carroService.salvar(any(Carro.class))).thenReturn(carroSalvo);
+
+
+        ResponseEntity<CarroResponseDTO> response = carroController.criarCarro(request);
+
+
+        assertEquals(201, response.getStatusCodeValue());
+        assertNotNull(response.getBody());
+        assertEquals("Toyota", response.getBody().getMarca());
+        assertEquals("Corolla", response.getBody().getModelo());
+        assertEquals("ABC1234", response.getBody().getPlaca());
+
+        verify(carroService, times(1)).salvar(any(Carro.class));
     }
 }

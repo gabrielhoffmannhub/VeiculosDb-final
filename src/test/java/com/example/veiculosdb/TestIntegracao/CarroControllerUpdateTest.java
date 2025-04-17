@@ -1,5 +1,4 @@
-package com.example.veiculosdb;
-
+package com.example.veiculosdb.TestIntegracao;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ public class CarroControllerUpdateTest {
 
     @Test
     void deveAtualizarCarroComSucesso() throws Exception {
-        String carroJson = """
+        String carroJsonCriacao = """
             {
                 "marca": "Hyundai",
                 "modelo": "HB20",
@@ -37,10 +36,27 @@ public class CarroControllerUpdateTest {
 
         String token = obterTokenJWT();
 
+        mockMvc.perform(post("/api/v1/carros")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(carroJsonCriacao))
+                .andExpect(status().isCreated());
+
+        String carroJsonAtualizacao = """
+            {
+                "marca": "Hyundai",
+                "modelo": "HB20",
+                "anoFabricacao": 2020,
+                "placa": "XYZ5678",
+                "tipo": "Hatch",
+                "valorMercado": 55000
+            }
+        """;
+
         mockMvc.perform(put("/api/v1/carros/XYZ5678")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(carroJson))
+                        .content(carroJsonAtualizacao))
                 .andExpect(status().isOk());
     }
 

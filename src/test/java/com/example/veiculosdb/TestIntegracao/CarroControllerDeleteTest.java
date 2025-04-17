@@ -1,4 +1,4 @@
-package com.example.veiculosdb;
+package com.example.veiculosdb.TestIntegracao;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
