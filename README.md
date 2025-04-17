@@ -58,4 +58,4 @@ Para rodar os testes:
 
 bash
 Copiar código
-./mvnw test
+mvn test
