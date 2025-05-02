@@ -16,26 +16,26 @@ public class CarroRepository implements CarroRepositoryPort {
     private final AtomicLong idCounter = new AtomicLong(1);
 
     @Override
-    public Carro save(Carro carro) {
+    public Carro salvar(Carro carro) {
         carro.setId(idCounter.getAndIncrement());
         carros.add(carro);
         return carro;
     }
 
     @Override
-    public List<Carro> findAll() {
+    public List<Carro> listarTodos() {
         return carros;
     }
 
     @Override
-    public Optional<Carro> findByPlaca(String placa) {
+    public Optional<Carro> buscarPorPlaca(String placa) {
         return carros.stream()
                 .filter(carro -> carro.getPlaca().equals(placa))
                 .findFirst();
     }
 
     @Override
-    public void delete(Carro carro) {
+    public void deletar(Carro carro) {
         carros.remove(carro);
     }
 }

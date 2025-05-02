@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CarroRepositoryPort {
-    Carro save(Carro carro);
-    List<Carro> findAll();
-    Optional<Carro> findByPlaca(String placa);
-    void delete(Carro carro);
+    Carro salvar(Carro carro);
+    List<Carro> listarTodos();
+    Optional<Carro> buscarPorPlaca(String placa);
+    void deletar(Carro carro);
 }
 
 

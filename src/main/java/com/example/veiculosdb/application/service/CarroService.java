@@ -23,13 +23,13 @@ public class CarroService implements CarroServicePort {
     @Override
     public CarroResponseDTO salvar(CarroRequestDTO dto) {
         Carro carro = new Carro(null, dto.getMarca(), dto.getModelo(), dto.getAnoFabricacao(), dto.getPlaca(), dto.getTipo(), dto.getValorMercado());
-        Carro salvo = carroRepositoryPort.save(carro);
+        Carro salvo = carroRepositoryPort.salvar(carro);
         return new CarroResponseDTO(salvo);
     }
 
     @Override
     public List<CarroResponseDTO> listarTodos() {
-        return carroRepositoryPort.findAll()
+        return carroRepositoryPort.listarTodos()
                 .stream()
                 .map(CarroResponseDTO::new)
                 .collect(Collectors.toList());
@@ -37,14 +37,14 @@ public class CarroService implements CarroServicePort {
 
     @Override
     public CarroResponseDTO buscarPorPlaca(String placa) {
-        Carro carro = carroRepositoryPort.findByPlaca(placa)
+        Carro carro = carroRepositoryPort.buscarPorPlaca(placa)
                 .orElseThrow(() -> new CarroNotFoundException("Carro com placa " + placa + " não encontrado"));
         return new CarroResponseDTO(carro);
     }
 
     @Override
     public CarroResponseDTO atualizarPorPlaca(String placa, CarroRequestDTO dto) {
-        Carro carro = carroRepositoryPort.findByPlaca(placa)
+        Carro carro = carroRepositoryPort.buscarPorPlaca(placa)
                 .orElseThrow(() -> new CarroNotFoundException("Carro com placa " + placa + " não encontrado"));
 
         carro.setMarca(dto.getMarca());
@@ -52,33 +52,23 @@ public class CarroService implements CarroServicePort {
         carro.setAnoFabricacao(dto.getAnoFabricacao());
         carro.setTipo(dto.getTipo());
         carro.setValorMercado(dto.getValorMercado());
-        Carro atualizado = carroRepositoryPort.save(carro);
+        Carro atualizado = carroRepositoryPort.salvar(carro);
         return new CarroResponseDTO(atualizado);
     }
 
     @Override
     public void deletarPorPlaca(String placa) {
-        Carro carro = carroRepositoryPort.findByPlaca(placa)
+        Carro carro = carroRepositoryPort.buscarPorPlaca(placa)
                 .orElseThrow(() -> new CarroNotFoundException("Carro com placa " + placa + " não encontrado"));
 
-        carroRepositoryPort.delete(carro);
+        carroRepositoryPort.deletar(carro);
     }
 
     @Override
     public BigDecimal calcularDepreciacao(String placa) {
-        Carro carro = carroRepositoryPort.findByPlaca(placa)
+        Carro carro = carroRepositoryPort.buscarPorPlaca(placa)
                 .orElseThrow(() -> new CarroNotFoundException("Carro com placa " + placa + " não encontrado"));
-        int anoAtual = LocalDate.now().getYear();
-        int anosDeUso = anoAtual - carro.getAnoFabricacao();
-
-        if (anosDeUso <= 0) {
-            return carro.getValorMercado();
-        }
-
-        double taxaDepreciacaoAnual = 0.05;
-        double fatorDepreciacao = Math.pow(1 - taxaDepreciacaoAnual, anosDeUso);
-        BigDecimal valorFinal = carro.getValorMercado().multiply(BigDecimal.valueOf(fatorDepreciacao));
-        return valorFinal.setScale(2, RoundingMode.HALF_UP);
+       return carro.calcularDepreciacao();
     }
 
 }
