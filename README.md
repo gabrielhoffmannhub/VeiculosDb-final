@@ -26,17 +26,7 @@ Para rodar o projeto:
 
 #### 3. Gere a chave JWT para a autenticação
 
-- você pode gerar uma chave com o seguinte comando: openssl rand -base64 32
-
-- Essa chave será usada para assinar o token.
-
-#### 6. Ao rodar o projeto, defina a chave JWT no terminal como uma variável de ambiente
-   
-- No Linux/macOS: export JWT_SECRET=<sua_chave_gerada>
-
-- No Windows (cmd): set JWT_SECRET=<sua_chave_gerada>
-
-#### 5. Instale as dependências e inicie o projeto:
+#### 4. Instale as dependências e inicie o projeto:
    
 - mvn clean install
 
@@ -52,26 +42,12 @@ Para rodar o projeto:
 
 # 🔐 Autenticação
 #### A autenticação é feita via JWT. 
-#### Para obter o token:
-
-POST /auth
-
-Body: 
-
-{
-
-  "username": "admin",
-  
-  "password": "admin"
-  
-}
-#### O token JWT será retornado e deve ser utilizado no header das requisições autenticadas:
-
-#### Header: 
-
-Authorization:Bearer <seu_token>
+##### Login: admin
+##### senha: 1234
 
 ## 🚘 Endpoints
+
+###
 
 Método | Endpoint | Descrição
 
