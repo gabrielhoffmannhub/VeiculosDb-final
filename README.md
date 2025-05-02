@@ -1,64 +1,51 @@
-# 🚗 Veículos DB
-Uma API RESTful desenvolvida com Spring Boot para gerenciar registros de veículos, utilizando arquitetura hexagonal, autenticação via JWT e boas práticas de desenvolvimento.
+# 🚀 Tecnologias Utilizadas
+#### Java 17+
 
-## 🛠️ Tecnologias Utilizadas
-Java 17+
+#### Spring Boot
 
-Spring Boot
+#### Spring Security
 
-Spring Security
+#### JWT (JSON Web Token)
 
-JWT (JSON Web Token)
+#### Maven
 
-Maven
+#### JPA / Hibernate
 
-JPA / Hibernate
+#### H2 (para testes)
 
-H2 (para testes)
+#### JUnit / Mockito
 
-JUnit / Mockito
+# ⚙️ Instalação
+Para rodar o projeto:Clone o repositório: bash''' git clone https://github.com/gabrielhoffmannhub/VeiculosDb-final.git
+Entre no diretório do projeto:
 
-# 📦 Instalação
-Para rodar o projeto:
-#### 1. Clone o repositório: git clone https://github.com/seu-usuario/veiculosdb.git
+bash
+Copiar
+Editar
+cd VeiculosDb-final
+Gere a chave JWT para a autenticação.
 
-#### 2. Entre no diretório do projeto 
+Instale as dependências e inicie o projeto:
 
-#### 3. Gere a chave JWT para a autenticação
+bash
+Copiar
+Editar
+mvn clean install
+mvn spring-boot:run
+A API estará disponível em: http://localhost:8080
 
-#### 4. Instale as dependências e inicie o projeto:
-   
-- mvn clean install
+✅ Testes
+Para rodar os testes (não é necessário gerar a chave JWT para os testes):
 
-- mvn spring-boot:run
+Execute os testes com o comando:
 
-- A API estará disponível em: http://localhost:8080
+bash
+Copiar
+Editar
+mvn test
+🔐 Autenticação
+A autenticação é realizada via JWT (JSON Web Token). Para acessar as rotas protegidas, é necessário incluir o token JWT no cabeçalho das requisições.
 
-# 🧪Testes
-### Para rodar os testes (não é necessário gerar a chave JWT para os testes)
-#### Execute os testes com o comando: 
-
-- mvn test
-
-# 🔐 Autenticação
-#### A autenticação é feita via JWT. 
-##### Login: admin
-##### senha: 1234
-
-## 🚘 Endpoints
-
-###
-
-Método | Endpoint | Descrição
-
-GET | /carros | Lista todos os carros
-
-POST | /carros | Cadastra um novo carro
-
-GET | /carros/{id} | Busca um carro por ID
-
-PUT | /carros/{id} | Atualiza um carro
-DELETE | /carros/{id} | Remove um carro
-
-
+📁 Estrutura do Projeto
+O projeto segue a arquitetura hexagonal, promovendo uma separação clara entre as camadas de domínio, aplicação e infraestrutura. Isso facilita a manutenção e a escalabilidade do sistema.
 
