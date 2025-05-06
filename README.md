@@ -13,7 +13,7 @@ API RESTful desenvolvida com Spring Boot para o gerenciamento de veículos. O pr
 - Swagger (springdoc-openapi)
 - JPA / Hibernate
 - Banco de dados H2 (testes)
-- JUnit 5 e Mockito
+- JUnit 5.10 e Mockito
 
 ---
 
@@ -48,3 +48,9 @@ Apenas o Swagger está protegido para evitar acesso público à documentação i
 ## 📁 Estrutura do Projeto
 O projeto segue a arquitetura hexagonal, promovendo uma separação clara entre as camadas de domínio, aplicação e infraestrutura. Isso facilita a manutenção e a escalabilidade do sistema.
 
+---
+
+## 🧪 Testes
+Os testes podem ser executados com:
+  ```bash
+  ./mvnw test
