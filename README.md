@@ -1,4 +1,4 @@
-# 🚗 Veículos DB - API REST
+# 🚗 Veículos DB - API RESTful
 
 API RESTful desenvolvida com Spring Boot para o gerenciamento de veículos. O projeto segue a **arquitetura hexagonal (ports and adapters)**, utiliza autenticação via **JWT**, documentação interativa com **Swagger**, e boas práticas de testes com **H2** e **Mockito**.
 
