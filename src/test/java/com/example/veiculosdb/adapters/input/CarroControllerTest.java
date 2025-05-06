@@ -1,40 +1,34 @@
-package com.example.veiculosdbtest.adapters.input;
+package com.example.veiculosdb.adapters.input;
 
-import com.example.veiculosdb.VeiculosDbApplication;
-import com.example.veiculosdb.adapters.input.CarroController;
 import com.example.veiculosdb.dto.CarroRequestDTO;
 import com.example.veiculosdb.dto.CarroResponseDTO;
 import com.example.veiculosdb.exception.CarroNotFoundException;
 import com.example.veiculosdb.ports.input.CarroServicePort;
-import com.example.veiculosdbtest.config.TestSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(CarroController.class)
-@Import({TestSecurityConfig.class, TestSecurityConfig.class})
-@ActiveProfiles("test")
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("dev")
 class CarroControllerTest {
 
     @Autowired
@@ -56,7 +50,7 @@ class CarroControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @WithMockUser(username = "admin", roles = "USER")
+    @WithMockUser(username = "admin", password = "{noop}1234" ,roles = "USER")
     void testCriarCarro() throws Exception {
         CarroRequestDTO request = new CarroRequestDTO("Fiat", "Uno", 2020, "ABC1234", "Hatch", BigDecimal.valueOf(30000));
         CarroResponseDTO response = new CarroResponseDTO(1L, "Fiat", "Uno", 2020, "ABC1234", "Hatch", BigDecimal.valueOf(30000));
@@ -74,7 +68,7 @@ class CarroControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "USER")
+    @WithMockUser(username = "admin", password = "{noop}1234" , roles = "USER")
     void testListarTodos() throws Exception {
         CarroResponseDTO response = new CarroResponseDTO(1L, "Fiat", "Uno", 2020, "ABC1234", "Hatch", BigDecimal.valueOf(30000));
         when(carroServicePort.listarTodos()).thenReturn(List.of(response));
@@ -87,7 +81,7 @@ class CarroControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "USER")
+    @WithMockUser(username = "admin", password = "{noop}1234" , roles = "USER")
     void testBuscarPorPlaca_ComSucesso() throws Exception {
         CarroResponseDTO response = new CarroResponseDTO(1L, "Fiat", "Uno", 2020, "ABC1234", "Hatch", BigDecimal.valueOf(30000));
         when(carroServicePort.buscarPorPlaca("ABC1234")).thenReturn(response);
@@ -100,7 +94,7 @@ class CarroControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "USER")
+    @WithMockUser(username = "admin", password = "{noop}1234", roles = "USER")
     void testBuscarPorPlaca_NaoEncontrado() throws Exception {
         when(carroServicePort.buscarPorPlaca("XYZ9999")).thenThrow(new CarroNotFoundException("Não encontrado"));
 
@@ -111,7 +105,7 @@ class CarroControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "USER")
+    @WithMockUser(username = "admin",  password = "{noop}1234", roles = "USER")
     void testAtualizarCarro() throws Exception {
         CarroRequestDTO request = new CarroRequestDTO("Fiat", "Palio", 2019, "ABC1234", "Hatch", BigDecimal.valueOf(25000));
         CarroResponseDTO response = new CarroResponseDTO(1L, "Fiat", "Palio", 2019, "ABC1234", "Hatch", BigDecimal.valueOf(25000));
@@ -128,7 +122,7 @@ class CarroControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "USER")
+    @WithMockUser(username = "admin", password = "{noop}1234", roles = "USER")
     void testDeletarCarro() throws Exception {
         mockMvc.perform(delete("/api/v1/carros/ABC1234"))
                 .andExpect(status().isNoContent());
@@ -137,7 +131,7 @@ class CarroControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "USER")
+    @WithMockUser(username = "admin", password = "{noop}1234", roles = "USER")
     void testCalcularDepreciacao() throws Exception {
         BigDecimal valorDepreciado = BigDecimal.valueOf(20000);
         when(carroServicePort.calcularDepreciacao("ABC1234")).thenReturn(valorDepreciado);
