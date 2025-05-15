@@ -4,6 +4,7 @@ import com.example.veiculosdb.dto.CarroRequestDTO;
 import com.example.veiculosdb.dto.CarroResponseDTO;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public interface CarroServicePort {
 
@@ -11,9 +12,9 @@ public interface CarroServicePort {
 
     List<CarroResponseDTO> listarTodos();
 
-    CarroResponseDTO buscarPorPlaca(String placa);
+    Optional<CarroResponseDTO> buscarPorPlaca(String placa);
 
-    CarroResponseDTO atualizarPorPlaca(String placa, CarroRequestDTO dto);
+    Optional<CarroResponseDTO> atualizarPorPlaca(String placa, CarroRequestDTO dto);
 
     void deletarPorPlaca(String placa);
 

@@ -3,7 +3,6 @@ package com.example.veiculosdb.dto;
 import com.example.veiculosdb.domain.model.Carro;
 import lombok.Getter;
 import lombok.AllArgsConstructor;
-
 import java.math.BigDecimal;
 
 @Getter

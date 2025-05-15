@@ -2,11 +2,20 @@ package com.example.veiculosdb.adapters.input;
 
 import com.example.veiculosdb.dto.CarroRequestDTO;
 import com.example.veiculosdb.dto.CarroResponseDTO;
-import com.example.veiculosdb.exception.CarroNotFoundException;
+import com.example.veiculosdb.exception.InvalidCarroException;
 import com.example.veiculosdb.ports.input.CarroServicePort;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
@@ -14,6 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/carros")
 @RequiredArgsConstructor
+@Slf4j
 public class CarroController {
 
     private final CarroServicePort carroServicePort;
@@ -33,22 +43,16 @@ public class CarroController {
 
     @GetMapping("/{placa}")
     public ResponseEntity<CarroResponseDTO> buscarPorPlaca(@PathVariable String placa) {
-        try {
-            CarroResponseDTO carroResponseDTO = carroServicePort.buscarPorPlaca(placa);
-            return ResponseEntity.ok(carroResponseDTO);
-        } catch (CarroNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return carroServicePort.buscarPorPlaca(placa)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{placa}")
     public ResponseEntity<CarroResponseDTO> atualizarCarro(@PathVariable String placa, @RequestBody CarroRequestDTO dto) {
-        try {
-            CarroResponseDTO atualizado = carroServicePort.atualizarPorPlaca(placa, dto);
-            return ResponseEntity.ok(atualizado);
-        } catch (CarroNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return carroServicePort.atualizarPorPlaca(placa, dto)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{placa}")
@@ -56,7 +60,7 @@ public class CarroController {
         try {
             carroServicePort.deletarPorPlaca(placa);
             return ResponseEntity.noContent().build();
-        } catch (CarroNotFoundException e) {
+        } catch (InvalidCarroException e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -66,7 +70,7 @@ public class CarroController {
         try {
             BigDecimal valorDepreciado = carroServicePort.calcularDepreciacao(placa);
             return ResponseEntity.ok(valorDepreciado);
-        } catch (CarroNotFoundException e) {
+        } catch (InvalidCarroException e) {
             return ResponseEntity.notFound().build();
         }
     }

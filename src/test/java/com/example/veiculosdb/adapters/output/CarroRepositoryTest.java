@@ -4,11 +4,9 @@ import com.example.veiculosdb.adapters.output.persistence.CarroRepository;
 import com.example.veiculosdb.domain.model.Carro;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CarroRepositoryTest {

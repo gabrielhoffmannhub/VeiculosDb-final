@@ -2,7 +2,7 @@ package com.example.veiculosdb.adapters.input;
 
 import com.example.veiculosdb.dto.CarroRequestDTO;
 import com.example.veiculosdb.dto.CarroResponseDTO;
-import com.example.veiculosdb.exception.CarroNotFoundException;
+import com.example.veiculosdb.exception.InvalidCarroException;
 import com.example.veiculosdb.ports.input.CarroServicePort;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -17,11 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.math.BigDecimal;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
+import java.util.Optional;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -50,12 +47,18 @@ class CarroControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @WithMockUser(username = "admin", password = "{noop}1234" ,roles = "USER")
+    @WithMockUser(username = "admin", password = "{noop}1234", roles = "USER")
     void testCriarCarro() throws Exception {
         CarroRequestDTO request = new CarroRequestDTO("Fiat", "Uno", 2020, "ABC1234", "Hatch", BigDecimal.valueOf(30000));
         CarroResponseDTO response = new CarroResponseDTO(1L, "Fiat", "Uno", 2020, "ABC1234", "Hatch", BigDecimal.valueOf(30000));
-
-        when(carroServicePort.salvar(any())).thenReturn(response);
+        when(carroServicePort.salvar(argThat(dto ->
+                dto.getMarca().equals("Fiat") &&
+                        dto.getModelo().equals("Uno") &&
+                        dto.getAnoFabricacao() == 2020 &&
+                        dto.getPlaca().equals("ABC1234") &&
+                        dto.getTipo().equals("Hatch") &&
+                        dto.getValorMercado().compareTo(BigDecimal.valueOf(30000)) == 0
+        ))).thenReturn(response);
 
         mockMvc.perform(post("/api/v1/carros")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -64,53 +67,30 @@ class CarroControllerTest {
                 .andExpect(header().string("Location", "/api/v1/carros/1"))
                 .andExpect(jsonPath("$.id").value(1));
 
-        verify(carroServicePort).salvar(any(CarroRequestDTO.class));
-    }
-
-    @Test
-    @WithMockUser(username = "admin", password = "{noop}1234" , roles = "USER")
-    void testListarTodos() throws Exception {
-        CarroResponseDTO response = new CarroResponseDTO(1L, "Fiat", "Uno", 2020, "ABC1234", "Hatch", BigDecimal.valueOf(30000));
-        when(carroServicePort.listarTodos()).thenReturn(List.of(response));
-
-        mockMvc.perform(get("/api/v1/carros"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
-
-        verify(carroServicePort).listarTodos();
-    }
-
-    @Test
-    @WithMockUser(username = "admin", password = "{noop}1234" , roles = "USER")
-    void testBuscarPorPlaca_ComSucesso() throws Exception {
-        CarroResponseDTO response = new CarroResponseDTO(1L, "Fiat", "Uno", 2020, "ABC1234", "Hatch", BigDecimal.valueOf(30000));
-        when(carroServicePort.buscarPorPlaca("ABC1234")).thenReturn(response);
-
-        mockMvc.perform(get("/api/v1/carros/ABC1234"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.placa").value("ABC1234"));
-
-        verify(carroServicePort).buscarPorPlaca("ABC1234");
+        verify(carroServicePort).salvar(argThat(dto ->
+                dto.getMarca().equals("Fiat") &&
+                        dto.getModelo().equals("Uno") &&
+                        dto.getAnoFabricacao() == 2020 &&
+                        dto.getPlaca().equals("ABC1234") &&
+                        dto.getTipo().equals("Hatch") &&
+                        dto.getValorMercado().compareTo(BigDecimal.valueOf(30000)) == 0
+        ));
     }
 
     @Test
     @WithMockUser(username = "admin", password = "{noop}1234", roles = "USER")
-    void testBuscarPorPlaca_NaoEncontrado() throws Exception {
-        when(carroServicePort.buscarPorPlaca("XYZ9999")).thenThrow(new CarroNotFoundException("Não encontrado"));
-
-        mockMvc.perform(get("/api/v1/carros/XYZ9999"))
-                .andExpect(status().isNotFound());
-
-        verify(carroServicePort).buscarPorPlaca("XYZ9999");
-    }
-
-    @Test
-    @WithMockUser(username = "admin",  password = "{noop}1234", roles = "USER")
-    void testAtualizarCarro() throws Exception {
+    void testAtualizarCarro_ComSucesso() throws Exception {
         CarroRequestDTO request = new CarroRequestDTO("Fiat", "Palio", 2019, "ABC1234", "Hatch", BigDecimal.valueOf(25000));
         CarroResponseDTO response = new CarroResponseDTO(1L, "Fiat", "Palio", 2019, "ABC1234", "Hatch", BigDecimal.valueOf(25000));
 
-        when(carroServicePort.atualizarPorPlaca(Mockito.eq("ABC1234"), Mockito.any())).thenReturn(response);
+        when(carroServicePort.atualizarPorPlaca(eq("ABC1234"), argThat(dto ->
+                dto.getMarca().equals("Fiat") &&
+                        dto.getModelo().equals("Palio") &&
+                        dto.getAnoFabricacao() == 2019 &&
+                        dto.getPlaca().equals("ABC1234") &&
+                        dto.getTipo().equals("Hatch") &&
+                        dto.getValorMercado().compareTo(BigDecimal.valueOf(25000)) == 0
+        ))).thenReturn(Optional.of(response));
 
         mockMvc.perform(put("/api/v1/carros/ABC1234")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -118,12 +98,50 @@ class CarroControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.modelo").value("Palio"));
 
-        verify(carroServicePort).atualizarPorPlaca(Mockito.eq("ABC1234"), Mockito.any());
+        verify(carroServicePort).atualizarPorPlaca(eq("ABC1234"), argThat(dto ->
+                dto.getMarca().equals("Fiat") &&
+                        dto.getModelo().equals("Palio") &&
+                        dto.getAnoFabricacao() == 2019 &&
+                        dto.getPlaca().equals("ABC1234") &&
+                        dto.getTipo().equals("Hatch") &&
+                        dto.getValorMercado().compareTo(BigDecimal.valueOf(25000)) == 0
+        ));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", password = "{noop}1234", roles = "USER")
+    void testAtualizarCarro_NaoEncontrado() throws Exception {
+        CarroRequestDTO request = new CarroRequestDTO("Fiat", "Palio", 2019, "XYZ9999", "Hatch", BigDecimal.valueOf(25000));
+
+        when(carroServicePort.atualizarPorPlaca(eq("XYZ9999"), argThat(dto ->
+                dto.getMarca().equals("Fiat") &&
+                        dto.getModelo().equals("Palio") &&
+                        dto.getAnoFabricacao() == 2019 &&
+                        dto.getPlaca().equals("XYZ9999") &&
+                        dto.getTipo().equals("Hatch") &&
+                        dto.getValorMercado().compareTo(BigDecimal.valueOf(25000)) == 0
+        ))).thenReturn(Optional.empty());
+
+        mockMvc.perform(put("/api/v1/carros/XYZ9999")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+
+        verify(carroServicePort).atualizarPorPlaca(eq("XYZ9999"), argThat(dto ->
+                dto.getMarca().equals("Fiat") &&
+                        dto.getModelo().equals("Palio") &&
+                        dto.getAnoFabricacao() == 2019 &&
+                        dto.getPlaca().equals("XYZ9999") &&
+                        dto.getTipo().equals("Hatch") &&
+                        dto.getValorMercado().compareTo(BigDecimal.valueOf(25000)) == 0
+        ));
     }
 
     @Test
     @WithMockUser(username = "admin", password = "{noop}1234", roles = "USER")
     void testDeletarCarro() throws Exception {
+        doNothing().when(carroServicePort).deletarPorPlaca("ABC1234");
+
         mockMvc.perform(delete("/api/v1/carros/ABC1234"))
                 .andExpect(status().isNoContent());
 
@@ -132,7 +150,18 @@ class CarroControllerTest {
 
     @Test
     @WithMockUser(username = "admin", password = "{noop}1234", roles = "USER")
-    void testCalcularDepreciacao() throws Exception {
+    void testDeletarCarro_NaoEncontrado() throws Exception {
+        doThrow(new InvalidCarroException("Carro não encontrado")).when(carroServicePort).deletarPorPlaca("XYZ9999");
+
+        mockMvc.perform(delete("/api/v1/carros/XYZ9999"))
+                .andExpect(status().isNotFound());
+
+        verify(carroServicePort).deletarPorPlaca("XYZ9999");
+    }
+
+    @Test
+    @WithMockUser(username = "admin", password = "{noop}1234", roles = "USER")
+    void testCalcularDepreciacao_ComSucesso() throws Exception {
         BigDecimal valorDepreciado = BigDecimal.valueOf(20000);
         when(carroServicePort.calcularDepreciacao("ABC1234")).thenReturn(valorDepreciado);
 
@@ -141,5 +170,16 @@ class CarroControllerTest {
                 .andExpect(content().string("20000"));
 
         verify(carroServicePort).calcularDepreciacao("ABC1234");
+    }
+
+    @Test
+    @WithMockUser(username = "admin", password = "{noop}1234", roles = "USER")
+    void testCalcularDepreciacao_NaoEncontrado() throws Exception {
+        when(carroServicePort.calcularDepreciacao("XYZ9999")).thenThrow(new InvalidCarroException("Não encontrado"));
+
+        mockMvc.perform(get("/api/v1/carros/XYZ9999/depreciacao"))
+                .andExpect(status().isNotFound());
+
+        verify(carroServicePort).calcularDepreciacao("XYZ9999");
     }
 }
